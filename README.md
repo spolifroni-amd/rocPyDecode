@@ -93,8 +93,10 @@ sudo pip3 install .
 # the generated .whl file will be located under subfolder ./dist/
 git clone https://github.com/ROCm/rocPyDecode.git
 cd rocPyDecode
+
 # Create/Build the wheel and install it
 sudo python3 build_rocpydecode_wheel.py
+
 # alternative method
 sudo python3 setup.py bdist_wheel
 ```
@@ -110,6 +112,9 @@ python rocPyDecode-docker-install.py
 ```
 >[!NOTE]
 > Do NOT use `sudo`
+
+### creating rocPyDecode conda package
+* Information on how to create and install rocPyDecode conda package is located [here](https://github.com/ROCm/rocPyDecode/blob/develop/conda-recipe/README.md).
 
 ## Run CTest
 This will run python samples and show pass/fail.
