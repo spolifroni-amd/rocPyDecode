@@ -11,7 +11,7 @@ The rocDecode Python Binding, rocPyDecode, is a tool that allows users to access
 ## Prerequisites
 
 * Linux distribution
-  * Ubuntu - `20.04` / `22.04`
+  * Ubuntu - `22.04` / `24.04`
 
 * [ROCm-supported hardware](https://rocm.docs.amd.com/projects/install-on-linux/en/latest/reference/system-requirements.html)
 > [!IMPORTANT] 
@@ -21,11 +21,13 @@ The rocDecode Python Binding, rocPyDecode, is a tool that allows users to access
 > [!IMPORTANT]
 > `sudo amdgpu-install --usecase=rocm`
 
-* CMake `3.5` or higher
+* CMake `3.12` or higher
   
   ```shell
   sudo apt install cmake
   ```
+
+* AMD Clang++ Version `18.0.0` or later - installed with ROCm
 
 * Python3 and Python3 PIP
   
@@ -36,7 +38,7 @@ The rocDecode Python Binding, rocPyDecode, is a tool that allows users to access
 * [PyBind11](https://github.com/pybind/pybind11)
 
   ```shell
-  sudo apt install pybind11-dev
+  sudo pip3 install pybind11
   ```
 
 * [rocDecode](https://github.com/ROCm/rocDecode)
@@ -93,8 +95,10 @@ sudo pip3 install .
 # the generated .whl file will be located under subfolder ./dist/
 git clone https://github.com/ROCm/rocPyDecode.git
 cd rocPyDecode
+
 # Create/Build the wheel and install it
 sudo python3 build_rocpydecode_wheel.py
+
 # alternative method
 sudo python3 setup.py bdist_wheel
 ```
@@ -110,6 +114,9 @@ python rocPyDecode-docker-install.py
 ```
 >[!NOTE]
 > Do NOT use `sudo`
+
+### creating rocPyDecode conda package
+* Information on how to create and install rocPyDecode conda package is located [here](https://github.com/ROCm/rocPyDecode/blob/develop/conda-recipe/README.md).
 
 ## Run CTest
 This will run python samples and show pass/fail.
@@ -150,9 +157,6 @@ page.
 ## Tested configurations
 
 * Linux
-  * Ubuntu - `20.04` / `22.04`
-* ROCm:
-  * rocm-core - `6.2.0.60200-crdnnh.14042`
-  * amdgpu-core - `1:6.2.60200-1778439.22.04`
-* rocdecode - `0.6.0.60200-crdnnh.14042`
-* FFmpeg - `4.2.7` / `4.4.2-0`
+  * Ubuntu - `22.04` / `24.04`
+* ROCm: `6.3.0`
+* rocdecode - `0.9.0`

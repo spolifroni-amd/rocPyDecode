@@ -21,24 +21,29 @@
 #
 ################################################################################
 
-cmake_minimum_required (VERSION 3.12)
+cmake_minimum_required(VERSION 3.12)
 
-set(VERSION "0.2.0")
+# ROCM Path
+if(DEFINED ENV{ROCM_PATH})
+    set(ROCM_PATH $ENV{ROCM_PATH} CACHE PATH "Default ROCm installation path")
+elseif(ROCM_PATH)
+    message("-- INFO:ROCM_PATH Set -- ${ROCM_PATH}")
+else()
+    set(ROCM_PATH /opt/rocm CACHE PATH "Default ROCm installation path")
+endif()
+# Set AMD Clang as default compiler
+if (NOT DEFINED CMAKE_CXX_COMPILER AND EXISTS "${ROCM_PATH}/bin/amdclang++")
+    set(CMAKE_C_COMPILER ${ROCM_PATH}/bin/amdclang)
+    set(CMAKE_CXX_COMPILER ${ROCM_PATH}/bin/amdclang++)
+endif()
+
+set(VERSION "0.3.0")
 set(CMAKE_CXX_STANDARD 17)
 
 # Set Project Version and Language
 project(rocPyDecode VERSION ${VERSION} LANGUAGES CXX)
 
 set(TARGET_NAME rocPyDecode)
-
-# ROCM Path
-if(DEFINED ENV{ROCM_PATH})
-    set(ROCM_PATH $ENV{ROCM_PATH} CACHE PATH "${White}${PROJECT_NAME}: Default ROCm installation path${ColourReset}")
-elseif(ROCM_PATH)
-    message("-- ${White}${PROJECT_NAME} :ROCM_PATH Set -- ${ROCM_PATH}${ColourReset}")
-else()
-    set(ROCM_PATH /opt/rocm CACHE PATH "${White}${PROJECT_NAME}: Default ROCm installation path${ColourReset}")
-endif()
 
 # rocPyDecode build type
 set(DEFAULT_BUILD_TYPE "Release")
@@ -59,7 +64,6 @@ endif()
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 list(APPEND CMAKE_PREFIX_PATH ${ROCM_PATH}/hip ${ROCM_PATH})
-set(CMAKE_CXX_COMPILER ${ROCM_PATH}/lib/llvm/bin/clang++)
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "${DEFAULT_BUILD_TYPE}" CACHE STRING "rocPyDecode Default Build Type" FORCE)
@@ -69,8 +73,7 @@ endif()
 if(CMAKE_BUILD_TYPE MATCHES Debug)
     # -O0 -- Don't Optimize output file
     # -gdwarf-4  -- generate debugging information, dwarf-4 for making valgrind work
-    # -Og -- Optimize for debugging experience rather than speed or size
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -gdwarf-4 -Og")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -gdwarf-4")
 else()
     # -O3       -- Optimize output file 
     # -DNDEBUG  -- turn off asserts 
@@ -83,17 +86,30 @@ message("-- ${Cyan}     -D ROCPYDECODE_AMDGPU_TARGET=${ROCPYDECODE_AMDGPU_TARGET
 # set amdgpu targets with vcn support
 option(ROCPYDECODE_AMDGPU_TARGET "AMD GPU target ASIC to build rocPyDecode" "")
 
-set(DEFAULT_AMDGPU_TARGETS "gfx908;gfx90a;gfx940;gfx941;gfx942;gfx1030;gfx1031;gfx1032;gfx1100;gfx1101;gfx1102")
-
-# Set AMDGPU_TARGETS
-if(DEFINED ENV{AMDGPU_TARGETS})
-    set(AMDGPU_TARGETS $ENV{AMDGPU_TARGETS} CACHE STRING "List of specific machine types for library to target")
-elseif(AMDGPU_TARGETS)
-    message("-- ${White}${PROJECT_NAME} -- AMDGPU_TARGETS set with -D option${ColourReset}")
-else()
-    set(AMDGPU_TARGETS "${DEFAULT_AMDGPU_TARGETS}" CACHE STRING "List of specific machine types for library to target")
+# Set supported GPU Targets
+set(DEFAULT_GPU_TARGETS "gfx908;gfx90a;gfx942;gfx1030;gfx1031;gfx1032;gfx1100;gfx1101;gfx1102")
+if (BUILD_WITH_AMD_ADVANCE)
+    set(DEFAULT_GPU_TARGETS ${DEFAULT_GPU_TARGETS} "gfx1200;gfx1201")
 endif()
-message("-- ${White}${PROJECT_NAME} -- AMDGPU_TARGETS: ${AMDGPU_TARGETS}${ColourReset}")
+
+# Set AMD GPU_TARGETS
+if((AMDGPU_TARGETS OR DEFINED ENV{AMDGPU_TARGETS}) AND (NOT GPU_TARGETS))
+    message("-- ${Red}${PROJECT_NAME} DEPRECATION -- AMDGPU_TARGETS use is deprecated. Use GPU_TARGETS${ColourReset}")
+    if(DEFINED ENV{AMDGPU_TARGETS})
+        set(GPU_TARGETS $ENV{AMDGPU_TARGETS} CACHE STRING "List of specific machine types for library to target")
+    else()
+        set(GPU_TARGETS ${AMDGPU_TARGETS})
+    endif()
+endif()
+
+if(DEFINED ENV{GPU_ARCHS})
+    set(GPU_TARGETS $ENV{GPU_ARCHS} CACHE STRING "List of specific machine types for library to target")
+elseif(GPU_TARGETS)
+    message("-- ${White}${PROJECT_NAME} -- GPU_TARGETS set with -D option${ColourReset}")
+else()
+    set(GPU_TARGETS "${DEFAULT_GPU_TARGETS}" CACHE STRING "List of specific machine types for library to target")
+endif()
+message("-- ${White}${PROJECT_NAME} -- AMD GPU_TARGETS: ${GPU_TARGETS}${ColourReset}")
 
 find_package(HIP QUIET)
 find_package(FFmpeg QUIET)
@@ -103,10 +119,14 @@ find_package(Python3 QUIET COMPONENTS Interpreter Development)
 message("-- ${Green}NOTE: rocPyDecode requires Python3, Found --  ${Python3_EXECUTABLE} ${ColourReset}")
 
 find_package(pybind11 REQUIRED)
-message("-- ${Green}NOTE: rocPyDecode requires pybind11, Found --  ${pybind11_INCLUDE_DIRS} ${ColourReset}")
+if(pybind11_FOUND)
+    message("-- ${Green}NOTE: rocPyDecode requires pybind11, Found --  ${pybind11_INCLUDE_DIRS} ${ColourReset}")
+endif()
 
 find_package(dlpack REQUIRED)
-message("-- ${Green}NOTE: rocPyDecode requires dlpack, Found")
+if(dlpack_FOUND)
+    message("-- ${Green}NOTE: rocPyDecode requires dlpack, Found")
+endif()
 
 if(HIP_FOUND AND rocDecode_FOUND AND pybind11_FOUND AND Python3_FOUND AND FFMPEG_FOUND)
 
@@ -136,7 +156,7 @@ if(HIP_FOUND AND rocDecode_FOUND AND pybind11_FOUND AND Python3_FOUND AND FFMPEG
 
     file(GLOB_RECURSE pyfiles pyRocVideoDecode/*.py pyRocVideoDecode/*.pyi)
     file(GLOB_RECURSE include src/*.h)
-    file(GLOB_RECURSE sources src/*.cpp  ${ROCM_PATH}/share/rocdecode/utils/*.cpp ${ROCM_PATH}/share/rocdecode/utils/rocvideodecode/*.cpp)
+    file(GLOB sources src/*.cpp  ${ROCM_PATH}/share/rocdecode/utils/*.cpp ${ROCM_PATH}/share/rocdecode/utils/rocvideodecode/*.cpp)
 
     pybind11_add_module(${TARGET_NAME} MODULE ${sources})
 
@@ -156,6 +176,13 @@ if(HIP_FOUND AND rocDecode_FOUND AND pybind11_FOUND AND Python3_FOUND AND FFMPEG
         target_compile_definitions(${TARGET_NAME} PUBLIC CODEC_SUPPORTED_CHECK=1)
     else()
         target_compile_definitions(${TARGET_NAME} PUBLIC CODEC_SUPPORTED_CHECK=0)
+    endif()
+
+    # TODO: remove after ROCDECODE_CHECK_VERSION macro is pushed to mainline
+    if(${ROCDECODE_MAJOR_VERSION} VERSION_GREATER_EQUAL "0" AND ${ROCDECODE_MINOR_VERSION} VERSION_GREATER_EQUAL "10" AND ${ROCDECODE_MICRO_VERSION} VERSION_GREATER_EQUAL "0")
+        target_compile_definitions(${TARGET_NAME} PUBLIC MD5_MOVED_CHECK=1)
+    else()
+        target_compile_definitions(${TARGET_NAME} PUBLIC MD5_MOVED_CHECK=0)
     endif()
 
     set_target_properties(${TARGET_NAME} PROPERTIES

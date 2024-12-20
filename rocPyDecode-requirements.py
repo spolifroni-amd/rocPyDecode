@@ -29,7 +29,7 @@ else:
     import subprocess
 
 __copyright__ = "Copyright (c) 2024, AMD ROCm rocPyDecode"
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 __status__ = "Shipping"
 
 # error check calls
@@ -139,7 +139,6 @@ coreDebianPackages = [
     'rocdecode-dev',
     'rocdecode-test',
     'python3-dev',
-    'pybind11-dev',
     'libdlpack-dev'
 ]
 
@@ -179,4 +178,12 @@ elif "redhat" in platfromInfo:
             ERROR_CHECK(os.system('sudo '+linuxFlag+' '+linuxSystemInstall +
                     ' '+linuxSystemInstall_check+' install '+ coreRPMPackages[i]))
 
-print("\rocPyDecode Dependencies Installed with rocPyDecode-setup.py V-"+__version__+"\n")
+# make sure we have pybind11 installed via pip
+ERROR_CHECK(os.system('sudo pip3 install pybind11'))
+GREEN = "\033[32m"
+RESET = "\033[0m"
+print(f"{GREEN}pybind11 {RESET}successfully installed.\n")
+
+# done
+BOLD = '\033[1m'
+print(f"{GREEN}{BOLD}rocPyDecode Dependencies Installed {RESET}with rocPyDecode-setup.py V-"+__version__+"\n")
