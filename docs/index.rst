@@ -6,8 +6,7 @@
 rocPyDecode documentation
 ********************************************************************
 
-The rocDecode Python Binding, rocPyDecode, is a tool that allows users to access `rocDecode <https://rocm.docs.amd.com/projects/rocDecode/en/latest/>`_ APIs in both Python and C/C++. It connects Python and C/C++ libraries, enabling function 
-calling and data passing between the two languages.  To learn more, see :doc:`what-is-rocPyDecode`
+The rocDecode Python Binding, rocPyDecode, is a tool used to access `rocDecode <https://rocm.docs.amd.com/projects/rocDecode/en/latest/>`_ APIs in both Python and C/C++. It connects Python and C/C++ libraries, enabling function calling and data passing between the two languages.  To learn more, see :doc:`what-is-rocPyDecode`
 
 The rocPyDecode public repository is located at `https://github.com/ROCm/rocPyDecode <https://github.com/ROCm/rocPyDecode>`_.
 
@@ -35,9 +34,10 @@ The rocPyDecode public repository is located at `https://github.com/ROCm/rocPyDe
 
     * :doc:`Supported codecs and hardware <reference/rocPyDecode-codecs-and-hardware>`
     * :doc:`API reference<reference/rocPyDecode>`
-    * :doc:`Structs <reference/structures>`
-    * :doc:`Decode Class <reference/decoderClass>`
-    * :doc:`Demuxer CLass <reference/demuxerClass>`
+      
+      * :doc:`Structs <reference/structures>`
+      * :doc:`Decode Class <reference/decoderClass>`
+      * :doc:`Demuxer CLass <reference/demuxerClass>`
 
 
 To contribute to the documentation, refer to

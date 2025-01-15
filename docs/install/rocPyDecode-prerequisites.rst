@@ -26,4 +26,4 @@ rocPyDecode has the following prerequisites:
 * libstdc++-12-dev on Ubuntu 22.04
 * NumPy, for running tests and samples
 
-All prerequisites with the exception of libstdc++-12-dev are installed with the `rocPyDecode-requirements.py <https://github.com/ROCm/rocPyDecode/blob/develop/rocPyDecode-requirements.py>`_ script. 
+All prerequisites with the exception of NumPy and libstdc++-12-dev are installed with the `rocPyDecode-requirements.py <https://github.com/ROCm/rocPyDecode/blob/develop/rocPyDecode-requirements.py>`_ script. NumPy can be installed with ``pip``, and libstdc++-12-dev can be installed with a Linux package installer.
