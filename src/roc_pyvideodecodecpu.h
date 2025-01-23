@@ -25,9 +25,7 @@ THE SOFTWARE.
 #include "roc_video_dec.h"
 #include "roc_pydecode.h"
 #include "video_post_process.h"
-#ifdef MD5_MOVED_CHECK
-#include "md5.h"
-#endif
+#include "ffmpegvideodecode/ffmpeg_video_dec.h"
 
 typedef enum ReconfigFlushMode_enum {
     RECONFIG_FLUSH_MODE_NONE = 0,               /**<  Just flush to get the frame count */
@@ -39,22 +37,19 @@ typedef enum ReconfigFlushMode_enum {
 typedef struct ReconfigDumpFileStruct_t {
     bool b_dump_frames_to_file;
     std::string output_file_name;
-#ifdef MD5_MOVED_CHECK
-    void *md5_generator_handle;
-#endif
 } ReconfigDumpFileStruct;
 
 //
 // AMD Video Decoder Python Interface class
 //
-class PyRocVideoDecoder : public RocVideoDecoder {
+class PyRocVideoDecoderCpu : public FFMpegVideoDecoder {
 
     public:
-        PyRocVideoDecoder(int device_id, int mem_type, rocDecVideoCodec codec, bool force_zero_latency = false,
+        PyRocVideoDecoderCpu(int device_id, int mem_type, rocDecVideoCodec codec, bool force_zero_latency = false,
                           const Rect *p_crop_rect = nullptr, int max_width = 0, int max_height = 0,
-                          uint32_t clk_rate = 0) : RocVideoDecoder(device_id, static_cast<OutputSurfaceMemoryType>(mem_type), codec, force_zero_latency,
+                          uint32_t clk_rate = 0) : FFMpegVideoDecoder(device_id, static_cast<OutputSurfaceMemoryType>(mem_type), codec, force_zero_latency,
                           p_crop_rect, false, max_width, max_height, clk_rate) { InitConfigStructure(); }
-        ~PyRocVideoDecoder();                        
+        ~PyRocVideoDecoderCpu();                        
          
         // for python binding
         int PyDecodeFrame(PyPacketData& packet);
@@ -124,9 +119,6 @@ class PyRocVideoDecoder : public RocVideoDecoder {
         size_t CalculateRgbImageSize(OutputFormatEnum& e_output_format, OutputSurfaceInfo* p_surf_info);
         std::shared_ptr <ConfigInfo> configInfo;
         void InitConfigStructure();
-#ifdef MD5_MOVED_CHECK
-        MD5Generator *md5_generator = nullptr;
-#endif
 
         // for flush back to support multi-resolution video streams
         ReconfigParams PyReconfigParams;

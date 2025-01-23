@@ -20,48 +20,48 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "roc_pyvideodecode.h"
+#include "roc_pyvideodecodecpu.h"
 #include "colorspace_kernels.h"
 #include "resize_kernels.h"
 
 using namespace std;
 
-void PyRocVideoDecoderInitializer(py::module& m) {
-        py::class_<PyRocVideoDecoder> (m, "PyRocVideoDecoder")
+void PyRocVideoDecoderCpuInitializer(py::module& m) {
+        py::class_<PyRocVideoDecoderCpu> (m, "PyRocVideoDecoderCpu")
         .def(py::init<int,int,rocDecVideoCodec,bool,const Rect *,int,int,uint32_t>(),
                     py::arg("device_id") = 0, py::arg("out_mem_type") = 0, py::arg("codec") = rocDecVideoCodec_HEVC, py::arg("force_zero_latency") = false, 
                     py::arg("p_crop_rect") = nullptr, py::arg("max_width") = 0, py::arg("max_height") = 0, py::arg("clk_rate") = 1000)
-        .def("GetDeviceinfo",&PyRocVideoDecoder::PyGetDeviceinfo)
-        .def("DecodeFrame",&PyRocVideoDecoder::PyDecodeFrame)
-        .def("GetFrameYuv",&PyRocVideoDecoder::PyGetFrameYuv)
-        .def("GetFrameRgb",&PyRocVideoDecoder::PyGetFrameRgb)
-        .def("ResizeFrame",&PyRocVideoDecoder::PyResizeFrame)
-        .def("GetWidth",&PyRocVideoDecoder::PyGetWidth)
-        .def("GetHeight",&PyRocVideoDecoder::PyGetHeight)
-        .def("GetStride",&PyRocVideoDecoder::PyGetStride)
-        .def("GetFrameSize",&PyRocVideoDecoder::PyGetFrameSize)
-        .def("SaveFrameToFile",&PyRocVideoDecoder::PySaveFrameToFile)
-        .def("ReleaseFrame",&PyRocVideoDecoder::PyReleaseFrame)
-        .def("GetOutputSurfaceInfo",&PyRocVideoDecoder::PyGetOutputSurfaceInfo)
-        .def("GetResizedOutputSurfaceInfo",&PyRocVideoDecoder::PyGetResizedOutputSurfaceInfo)
-        .def("GetNumOfFlushedFrames",&PyRocVideoDecoder::PyGetNumOfFlushedFrames)
-        .def("SetReconfigParams",&PyRocVideoDecoder::PySetReconfigParams)
-        .def("InitMd5",&PyRocVideoDecoder::PyInitMd5)
-        .def("FinalizeMd5",&PyRocVideoDecoder::PyFinalizeMd5)
-        .def("UpdateMd5ForFrame",&PyRocVideoDecoder::PyUpdateMd5ForFrame)
-        .def("IsCodecSupported",&PyRocVideoDecoder::PyCodecSupported)
-        .def("GetBitDepth",&PyRocVideoDecoder::PyGetBitDepth)
+        .def("GetDeviceinfo",&PyRocVideoDecoderCpu::PyGetDeviceinfo)
+        .def("DecodeFrame",&PyRocVideoDecoderCpu::PyDecodeFrame)
+        .def("GetFrameYuv",&PyRocVideoDecoderCpu::PyGetFrameYuv)
+        .def("GetFrameRgb",&PyRocVideoDecoderCpu::PyGetFrameRgb)
+        .def("ResizeFrame",&PyRocVideoDecoderCpu::PyResizeFrame)
+        .def("GetWidth",&PyRocVideoDecoderCpu::PyGetWidth)
+        .def("GetHeight",&PyRocVideoDecoderCpu::PyGetHeight)
+        .def("GetStride",&PyRocVideoDecoderCpu::PyGetStride)
+        .def("GetFrameSize",&PyRocVideoDecoderCpu::PyGetFrameSize)
+        .def("SaveFrameToFile",&PyRocVideoDecoderCpu::PySaveFrameToFile)
+        .def("ReleaseFrame",&PyRocVideoDecoderCpu::PyReleaseFrame)
+        .def("GetOutputSurfaceInfo",&PyRocVideoDecoderCpu::PyGetOutputSurfaceInfo)
+        .def("GetResizedOutputSurfaceInfo",&PyRocVideoDecoderCpu::PyGetResizedOutputSurfaceInfo)
+        .def("GetNumOfFlushedFrames",&PyRocVideoDecoderCpu::PyGetNumOfFlushedFrames)
+        .def("SetReconfigParams",&PyRocVideoDecoderCpu::PySetReconfigParams)
+        .def("InitMd5",&PyRocVideoDecoderCpu::PyInitMd5)
+        .def("FinalizeMd5",&PyRocVideoDecoderCpu::PyFinalizeMd5)
+        .def("UpdateMd5ForFrame",&PyRocVideoDecoderCpu::PyUpdateMd5ForFrame)
+        .def("IsCodecSupported",&PyRocVideoDecoderCpu::PyCodecSupported)
+        .def("GetBitDepth",&PyRocVideoDecoderCpu::PyGetBitDepth)
 // TODO: Change after merging with mainline #if ROCDECODE_CHECK_VERSION(0,6,0)
 #if OVERHEAD_SUPPORT
-        .def("AddDecoderSessionOverHead",&PyRocVideoDecoder::PyAddDecoderSessionOverHead)
-        .def("GetDecoderSessionOverHead",&PyRocVideoDecoder::PyGetDecoderSessionOverHead)
+        .def("AddDecoderSessionOverHead",&PyRocVideoDecoderCpu::PyAddDecoderSessionOverHead)
+        .def("GetDecoderSessionOverHead",&PyRocVideoDecoderCpu::PyGetDecoderSessionOverHead)
 #endif
     ;
 }
 
 // callback function to flush last frames and save it to file when reconfigure happens
 // reference to non-static member function must be called
-int PyReconfigureFlushCallback(void *p_viddec_obj, uint32_t flush_mode, void * p_user_struct) {
+int PyReconfigureFlushCallbackCpu(void *p_viddec_obj, uint32_t flush_mode, void * p_user_struct) {
     int n_frames_flushed = 0;
     if ((p_viddec_obj == nullptr) ||  (p_user_struct == nullptr))
         return n_frames_flushed;
@@ -82,13 +82,6 @@ int PyReconfigureFlushCallback(void *p_viddec_obj, uint32_t flush_mode, void * p
                 }
             } else if (flush_mode == ReconfigFlushMode::RECONFIG_FLUSH_MODE_CALCULATE_MD5) {
 #if MD5_MOVED_CHECK
-                ReconfigDumpFileStruct *p_dump_file_struct = static_cast<ReconfigDumpFileStruct *>(p_user_struct);
-                if (p_dump_file_struct) {
-                    if (p_dump_file_struct->md5_generator_handle) {
-                        MD5Generator *md5_generator = static_cast<MD5Generator *>(p_dump_file_struct->md5_generator_handle);
-                        md5_generator->UpdateMd5ForFrame(pframe, surf_info);
-                    }
-                }
 #else
                 viddec->UpdateMd5ForFrame(pframe, surf_info);
 #endif
@@ -101,21 +94,16 @@ int PyReconfigureFlushCallback(void *p_viddec_obj, uint32_t flush_mode, void * p
     return n_frames_flushed;
 }
 
-py::object PyRocVideoDecoder::PySetReconfigParams(int flush_mode, std::string& output_file_name_in) {
+py::object PyRocVideoDecoderCpu::PySetReconfigParams(int flush_mode, std::string& output_file_name_in) {
     ReconfigFlushMode mode = static_cast<ReconfigFlushMode>(flush_mode);
     if(!output_file_name_in.empty()) {
         PyReconfigDumpFileStruct.output_file_name = output_file_name_in;
         PyReconfigDumpFileStruct.b_dump_frames_to_file = true;
-#if MD5_MOVED_CHECK
-        if(!md5_generator)
-            PyInitMd5();
-        PyReconfigDumpFileStruct.md5_generator_handle = static_cast<void*>(md5_generator);
-#endif
     } else {
         if(mode == RECONFIG_FLUSH_MODE_DUMP_TO_FILE)
             mode = RECONFIG_FLUSH_MODE_NONE;
     }
-    PyReconfigParams.p_fn_reconfigure_flush = PyReconfigureFlushCallback;
+    PyReconfigParams.p_fn_reconfigure_flush = PyReconfigureFlushCallbackCpu;
     PyReconfigParams.p_reconfig_user_struct = &PyReconfigDumpFileStruct;
     PyReconfigParams.reconfig_flush_mode = mode;
     // set the parent class
@@ -123,7 +111,7 @@ py::object PyRocVideoDecoder::PySetReconfigParams(int flush_mode, std::string& o
     return py::cast<py::none>(Py_None);
 }
 
-void PyRocVideoDecoder::InitConfigStructure() {
+void PyRocVideoDecoderCpu::InitConfigStructure() {
     // init config struct
     configInfo.reset(new ConfigInfo());
     configInfo.get()->device_name = std::string("");
@@ -139,7 +127,7 @@ void PyRocVideoDecoder::InitConfigStructure() {
     PyReconfigParams.reconfig_flush_mode = 0;
 }
 
-PyRocVideoDecoder::~PyRocVideoDecoder() {
+PyRocVideoDecoderCpu::~PyRocVideoDecoderCpu() {
     // free new RGB frame ptr if used
     if (frame_ptr_rgb != nullptr) {
         hipError_t hip_status = hipFree(frame_ptr_rgb);
@@ -167,7 +155,7 @@ PyRocVideoDecoder::~PyRocVideoDecoder() {
     }
 }
 
-int PyRocVideoDecoder::PyDecodeFrame(PyPacketData& packet) {
+int PyRocVideoDecoderCpu::PyDecodeFrame(PyPacketData& packet) {
     if(packet.bitstream_size == 0)
         packet.pkt_flags |= ROCDEC_PKT_ENDOFSTREAM;
     int decoded_frame_count = DecodeFrame(reinterpret_cast<const uint8_t *>(packet.bitstream_adrs), static_cast<size_t>(packet.bitstream_size), packet.pkt_flags, packet.frame_pts);
@@ -175,7 +163,7 @@ int PyRocVideoDecoder::PyDecodeFrame(PyPacketData& packet) {
 }
 
 // for python binding
-py::object PyRocVideoDecoder::PyGetFrameYuv(PyPacketData& packet, bool SeparateYuvPlanes) {
+py::object PyRocVideoDecoderCpu::PyGetFrameYuv(PyPacketData& packet, bool SeparateYuvPlanes) {
     int frame_size = GetFrameSize();
     int64_t pts = packet.frame_pts;
     packet.frame_adrs = reinterpret_cast<std::uintptr_t>(GetFrame(&pts));
@@ -221,7 +209,7 @@ py::object PyRocVideoDecoder::PyGetFrameYuv(PyPacketData& packet, bool SeparateY
     return py::cast(packet.frame_pts);
 }
 
-size_t PyRocVideoDecoder::CalculateRgbImageSize(OutputFormatEnum& e_output_format, OutputSurfaceInfo * p_surf_info) {
+size_t PyRocVideoDecoderCpu::CalculateRgbImageSize(OutputFormatEnum& e_output_format, OutputSurfaceInfo * p_surf_info) {
     size_t rgb_image_size = 0;
     int rgb_width = 0;
     if (p_surf_info->bit_depth == 8) {
@@ -235,7 +223,7 @@ size_t PyRocVideoDecoder::CalculateRgbImageSize(OutputFormatEnum& e_output_forma
 }
 
 // for python binding
-py::object PyRocVideoDecoder::PyGetFrameRgb(PyPacketData& packet, int rgb_format) {
+py::object PyRocVideoDecoderCpu::PyGetFrameRgb(PyPacketData& packet, int rgb_format) {
     OutputFormatEnum e_output_format = static_cast<OutputFormatEnum>(rgb_format);
     // Get YUV Frame
     int64_t pts = packet.frame_pts;
@@ -284,12 +272,12 @@ py::object PyRocVideoDecoder::PyGetFrameRgb(PyPacketData& packet, int rgb_format
 }
 
 // for python binding
-uintptr_t PyRocVideoDecoder::PyGetResizedOutputSurfaceInfo() {
+uintptr_t PyRocVideoDecoderCpu::PyGetResizedOutputSurfaceInfo() {
     return reinterpret_cast<std::uintptr_t>(resized_surf_info);
 }
 
 // for python binding
-uintptr_t PyRocVideoDecoder::PyResizeFrame(PyPacketData& packet, Dim *resized_dim, uintptr_t& in_surf_info) {
+uintptr_t PyRocVideoDecoderCpu::PyResizeFrame(PyPacketData& packet, Dim *resized_dim, uintptr_t& in_surf_info) {
     // check params
     if(resized_dim == nullptr || in_surf_info == 0)
         return 0;
@@ -347,19 +335,19 @@ uintptr_t PyRocVideoDecoder::PyResizeFrame(PyPacketData& packet, Dim *resized_di
 }
 
 // for python binding (can not move it to header for py)
-py::object PyRocVideoDecoder::PyGetNumOfFlushedFrames() {
+py::object PyRocVideoDecoderCpu::PyGetNumOfFlushedFrames() {
     int32_t ret = GetNumOfFlushedFrames();
     return py::cast(ret);
 }
 
 // for python binding
-py::object PyRocVideoDecoder::PyReleaseFrame(PyPacketData& packet) {
+py::object PyRocVideoDecoderCpu::PyReleaseFrame(PyPacketData& packet) {
     bool ret = ReleaseFrame(packet.frame_pts);
     return py::cast(ret);
 }
 
 // for python binding
-py::object PyRocVideoDecoder::PySaveFrameToFile(std::string& output_file_name_in, uintptr_t& surf_mem, uintptr_t& surface_info, OutputFormatEnum e_output_format) {
+py::object PyRocVideoDecoderCpu::PySaveFrameToFile(std::string& output_file_name_in, uintptr_t& surf_mem, uintptr_t& surface_info, OutputFormatEnum e_output_format) {
     std::string output_file_name = output_file_name_in.c_str();
     OutputSurfaceInfo *p_surf_info;
     bool ret = true;
@@ -378,13 +366,13 @@ py::object PyRocVideoDecoder::PySaveFrameToFile(std::string& output_file_name_in
 }
 
 // for python binding
-std::shared_ptr<ConfigInfo> PyRocVideoDecoder::PyGetDeviceinfo() {
+std::shared_ptr<ConfigInfo> PyRocVideoDecoderCpu::PyGetDeviceinfo() {
     GetDeviceinfo(configInfo.get()->device_name, configInfo.get()->gcn_arch_name, configInfo.get()->pci_bus_id, configInfo.get()->pci_domain_id, configInfo.get()->pci_device_id);
     return configInfo; 
 }
 
 // for python binding
-uintptr_t PyRocVideoDecoder::PyGetOutputSurfaceInfo() {
+uintptr_t PyRocVideoDecoderCpu::PyGetOutputSurfaceInfo() {
     OutputSurfaceInfo *l_surface_info;
     bool ret = GetOutputSurfaceInfo(&l_surface_info);
     if (ret) {
@@ -394,12 +382,8 @@ uintptr_t PyRocVideoDecoder::PyGetOutputSurfaceInfo() {
 }
  
 // for python binding
-py::object PyRocVideoDecoder::PyInitMd5() {
+py::object PyRocVideoDecoderCpu::PyInitMd5() {
 #if MD5_MOVED_CHECK
-    if (!md5_generator) {
-        md5_generator = new MD5Generator();
-    }
-    md5_generator->InitMd5();
 #else
     InitMd5();
 #endif
@@ -407,27 +391,18 @@ py::object PyRocVideoDecoder::PyInitMd5() {
 }
 
 // for python binding
-py::object PyRocVideoDecoder::PyUpdateMd5ForFrame(uintptr_t& surf_mem, uintptr_t& surface_info) {
-    if(surface_info && surf_mem) {
+py::object PyRocVideoDecoderCpu::PyUpdateMd5ForFrame(uintptr_t& surf_mem, uintptr_t& surface_info) {
 #if MD5_MOVED_CHECK
-        if(md5_generator) {
-            md5_generator->UpdateMd5ForFrame((void *)surf_mem, reinterpret_cast<OutputSurfaceInfo*>(surface_info));
-        }
 #else
+    if(surface_info && surf_mem)
         UpdateMd5ForFrame((void *)surf_mem, reinterpret_cast<OutputSurfaceInfo*>(surface_info));
 #endif
-    }
     return py::cast<py::none>(Py_None);
 }
 
 // for python binding
-py::object PyRocVideoDecoder::PyFinalizeMd5(uintptr_t& digest_back) {
+py::object PyRocVideoDecoderCpu::PyFinalizeMd5(uintptr_t& digest_back) {
 #if MD5_MOVED_CHECK
-    if(md5_generator) {
-        uint8_t * digest;
-        md5_generator->FinalizeMd5(&digest);
-        memcpy(reinterpret_cast<uint8_t*>(digest_back), digest,  sizeof(uint8_t) * 16);
-    }
 #else
     uint8_t * digest;
     FinalizeMd5(&digest);
@@ -437,27 +412,27 @@ py::object PyRocVideoDecoder::PyFinalizeMd5(uintptr_t& digest_back) {
 }
 
 // for python binding
-py::int_ PyRocVideoDecoder::PyGetWidth() {
+py::int_ PyRocVideoDecoderCpu::PyGetWidth() {
     return py::int_(static_cast<int>(GetWidth()));
 }
 
 // for python binding
-py::int_ PyRocVideoDecoder::PyGetHeight() {
+py::int_ PyRocVideoDecoderCpu::PyGetHeight() {
     return py::int_(static_cast<int>(GetHeight()));
 }
 
 // for python binding
-py::int_ PyRocVideoDecoder::PyGetFrameSize() {
+py::int_ PyRocVideoDecoderCpu::PyGetFrameSize() {
     return py::int_(static_cast<int>(GetFrameSize()));
 }
 
 // for python binding
-py::int_ PyRocVideoDecoder::PyGetStride() {
+py::int_ PyRocVideoDecoderCpu::PyGetStride() {
     return py::int_(static_cast<int>(GetSurfaceStride()));
 }
 
 // for python binding
-py::object PyRocVideoDecoder::PyCodecSupported(int device_id, rocDecVideoCodec codec_id, uint32_t bit_depth) {
+py::object PyRocVideoDecoderCpu::PyCodecSupported(int device_id, rocDecVideoCodec codec_id, uint32_t bit_depth) {
 #if CODEC_SUPPORTED_CHECK
     bool ret = CodecSupported(device_id, codec_id, bit_depth);
 #else
@@ -466,20 +441,20 @@ py::object PyRocVideoDecoder::PyCodecSupported(int device_id, rocDecVideoCodec c
     return py::cast(ret);
 }
 
-uint32_t PyRocVideoDecoder::PyGetBitDepth() {
+uint32_t PyRocVideoDecoderCpu::PyGetBitDepth() {
     return GetBitDepth();
 }
 
 // TODO: Change after merging with mainline #if ROCDECODE_CHECK_VERSION(0,6,0)
 #if OVERHEAD_SUPPORT
 // for python binding, Session overhead refers to decoder initialization and deinitialization time
-py::object PyRocVideoDecoder::PyAddDecoderSessionOverHead(int session_id, double duration) {
+py::object PyRocVideoDecoderCpu::PyAddDecoderSessionOverHead(int session_id, double duration) {
     AddDecoderSessionOverHead(static_cast<std::thread::id>(session_id), duration);
     return py::cast<py::none>(Py_None);
 }
 
 // for python binding, Session overhead refers to decoder initialization and deinitialization time
-py::object PyRocVideoDecoder::PyGetDecoderSessionOverHead(int session_id) {
+py::object PyRocVideoDecoderCpu::PyGetDecoderSessionOverHead(int session_id) {
     return py::cast(GetDecoderSessionOverHead(static_cast<std::thread::id>(session_id)));
 }
 
