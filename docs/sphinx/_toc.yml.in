@@ -9,8 +9,10 @@ subtrees:
 
 - caption: Install
   entries:
-  - file: install/install.md
-    title: Installation guide
+  - file: install/rocPyDecode-prerequisites
+    title: rocPyDecode prerequisites
+  - file: install/rocPyDecode-install
+    title: Installing rocPyDecode
 
 - caption: How to
   entries:
@@ -19,7 +21,9 @@ subtrees:
 
 - caption: Reference
   entries:
-  - file: reference/rocPyDecode.rst
+  - file: reference/rocPyDecode-codecs-and-hardware
+    title: rocPyDecode supported codecs and hardware
+  - file: reference/rocPyDecode
     title: rocPyDecode API
     subtrees:
     - entries:
@@ -31,7 +35,7 @@ subtrees:
 - caption: Tutorials
   entries:
   - url: https://github.com/ROCm/rocPyDecode/tree/develop/samples
-    title: GitHub samples
+    title: rocPyDecode samples
 
 - caption: About
   entries:
