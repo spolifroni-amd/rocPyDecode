@@ -6,7 +6,7 @@
 rocPyDecode documentation
 ********************************************************************
 
-The rocDecode Python Binding, rocPyDecode, is a tool used to access `rocDecode <https://rocm.docs.amd.com/projects/rocDecode/en/latest/>`_ APIs in both Python and C/C++. It connects Python and C/C++ libraries, enabling function calling and data passing between the two languages.  To learn more, see :doc:`what-is-rocPyDecode`
+rocPyDecode is a Python binding for the `rocDecode <https://rocm.docs.amd.com/projects/rocDecode/en/latest/>`_ APIs. It connects Python and C/C++ libraries, enabling function calling and data passing between the two languages.  To learn more, see :doc:`what-is-rocPyDecode`
 
 The rocPyDecode public repository is located at `https://github.com/ROCm/rocPyDecode <https://github.com/ROCm/rocPyDecode>`_.
 
@@ -18,9 +18,6 @@ The rocPyDecode public repository is located at `https://github.com/ROCm/rocPyDe
 
     * :doc:`Prerequisites <./install/rocPyDecode-prerequisites>`
     * :doc:`Installation <./install/rocPyDecode-install>`
-
-.. grid:: 2
-  :gutter: 3
 
   .. grid-item-card:: How to
 
