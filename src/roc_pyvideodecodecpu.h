@@ -25,6 +25,7 @@ THE SOFTWARE.
 #include "roc_video_dec.h"
 #include "roc_pydecode.h"
 #include "video_post_process.h"
+#include "ffmpegvideodecode/ffmpeg_video_dec.h"
 
 typedef enum ReconfigFlushMode_enum {
     RECONFIG_FLUSH_MODE_NONE = 0,               /**<  Just flush to get the frame count */
@@ -40,14 +41,14 @@ typedef struct ReconfigDumpFileStruct_t {
 //
 // AMD Video Decoder Python Interface class
 //
-class PyRocVideoDecoder : public RocVideoDecoder {
+class PyRocVideoDecoderCpu : public FFMpegVideoDecoder {
 
     public:
-        PyRocVideoDecoder(int device_id, int mem_type, rocDecVideoCodec codec, bool force_zero_latency = false,
+        PyRocVideoDecoderCpu(int device_id, int mem_type, rocDecVideoCodec codec, bool force_zero_latency = false,
                           const Rect *p_crop_rect = nullptr, int max_width = 0, int max_height = 0,
-                          uint32_t clk_rate = 0) : RocVideoDecoder(device_id, static_cast<OutputSurfaceMemoryType>(mem_type), codec, force_zero_latency,
+                          uint32_t clk_rate = 0) : FFMpegVideoDecoder(device_id, static_cast<OutputSurfaceMemoryType>(mem_type), codec, force_zero_latency,
                           p_crop_rect, false, max_width, max_height, clk_rate) { InitConfigStructure(); }
-        ~PyRocVideoDecoder();                        
+        ~PyRocVideoDecoderCpu();                        
          
         // for python binding
         int PyDecodeFrame(PyPacketData& packet);

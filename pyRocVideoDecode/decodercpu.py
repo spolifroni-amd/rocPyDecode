@@ -59,7 +59,7 @@ def GetRocPyDecPacket(pts, size, buffer):
     #pts_us = int(pts * 1000 * 1000)  #TBD: if needed in microseconds
     return rocpydec.GetRocPyDecPacket(0 if pts == None else int(pts), size, buffer)
 
-class decoder(object):
+class decodercpu(object):
     def __init__(
             self,
             codec,
@@ -71,7 +71,7 @@ class decoder(object):
             max_height = 0,
             clk_rate = 1000):
         p_crop_rect = GetRectangle(crop_rect)
-        self.viddec = rocpydec.PyRocVideoDecoder(
+        self.viddec = rocpydec.PyRocVideoDecoderCpu(
             device_id,
             mem_type,
             codec,

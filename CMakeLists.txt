@@ -37,7 +37,7 @@ if (NOT DEFINED CMAKE_CXX_COMPILER AND EXISTS "${ROCM_PATH}/bin/amdclang++")
     set(CMAKE_CXX_COMPILER ${ROCM_PATH}/bin/amdclang++)
 endif()
 
-set(VERSION "0.3.0")
+set(VERSION "0.3.1")
 set(CMAKE_CXX_STANDARD 17)
 
 # Set Project Version and Language
@@ -152,8 +152,8 @@ if(HIP_FOUND AND rocDecode_FOUND AND pybind11_FOUND AND Python3_FOUND AND FFMPEG
     include_directories(src)
 
     file(GLOB_RECURSE pyfiles pyRocVideoDecode/*.py pyRocVideoDecode/*.pyi)
-    file(GLOB_RECURSE include src/*.h)
-    file(GLOB sources src/*.cpp  ${ROCM_PATH}/share/rocdecode/utils/*.cpp ${ROCM_PATH}/share/rocdecode/utils/rocvideodecode/*.cpp)
+    file(GLOB_RECURSE include src/*.h ${ROCM_PATH}/share/rocdecode/utils/rocvideodecode/*.h ${ROCM_PATH}/share/rocdecode/utils/ffmpegvideodecode/*.h)
+    file(GLOB_RECURSE sources src/*.cpp  ${ROCM_PATH}/share/rocdecode/utils/*.cpp ${ROCM_PATH}/share/rocdecode/utils/rocvideodecode/*.cpp ${ROCM_PATH}/share/rocdecode/utils/ffmpegvideodecode/*.cpp)
 
     pybind11_add_module(${TARGET_NAME} MODULE ${sources})
 
@@ -173,13 +173,6 @@ if(HIP_FOUND AND rocDecode_FOUND AND pybind11_FOUND AND Python3_FOUND AND FFMPEG
         target_compile_definitions(${TARGET_NAME} PUBLIC CODEC_SUPPORTED_CHECK=1)
     else()
         target_compile_definitions(${TARGET_NAME} PUBLIC CODEC_SUPPORTED_CHECK=0)
-    endif()
-
-    # TODO: remove after ROCDECODE_CHECK_VERSION macro is pushed to mainline
-    if(${ROCDECODE_MAJOR_VERSION} VERSION_GREATER_EQUAL "0" AND ${ROCDECODE_MINOR_VERSION} VERSION_GREATER_EQUAL "10" AND ${ROCDECODE_MICRO_VERSION} VERSION_GREATER_EQUAL "0")
-        target_compile_definitions(${TARGET_NAME} PUBLIC MD5_MOVED_CHECK=1)
-    else()
-        target_compile_definitions(${TARGET_NAME} PUBLIC MD5_MOVED_CHECK=0)
     endif()
 
     set_target_properties(${TARGET_NAME} PROPERTIES

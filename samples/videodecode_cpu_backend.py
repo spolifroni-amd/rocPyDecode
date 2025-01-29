@@ -1,4 +1,4 @@
-import pyRocVideoDecode.decoder as dec
+import pyRocVideoDecode.decodercpu as dec
 import pyRocVideoDecode.demuxer as dmx
 import datetime
 import sys
@@ -11,7 +11,6 @@ def Decoder(
         output_file_path,
         device_id,
         mem_type,
-        b_force_zero_latency,
         crop_rect,
         seek_frame,
         seek_mode,
@@ -24,12 +23,13 @@ def Decoder(
     # get the used coded id
     codec_id = dec.GetRocDecCodecID(demuxer.GetCodecId())
 
-    # decoder instance
-    viddec = dec.decoder(
+    # ffmpeg decoder instance
+    print("info: rocPyDecode is using CPU backend!")
+    viddec = dec.decodercpu(
         codec_id,
         device_id,
         mem_type,
-        b_force_zero_latency,
+        False,
         crop_rect,
         0,
         0,
@@ -173,14 +173,6 @@ if __name__ == "__main__":
         help='mem_type of output surfce - 0: Internal 1: dev_copied 2: host_copied 3: MEM not mapped, optional, default 0',
         required=False)
     parser.add_argument(
-        '-z',
-        '--zero_latency',
-        type=str,
-        default='no',
-        choices=['yes', 'no'],
-        help='Force zero latency',
-        required=False)
-    parser.add_argument(
         '-crop',
         '--crop_rect',
         nargs=4,
@@ -226,7 +218,6 @@ if __name__ == "__main__":
     output_file_path = args.output
     device_id = args.device
     mem_type = args.mem_type
-    b_force_zero_latency = args.zero_latency.upper()
     crop_rect = args.crop_rect
     seek_frame = args.seek
     seek_mode = args.seek_mode
@@ -244,7 +235,6 @@ if __name__ == "__main__":
 
     # handle params
     mem_type = 0 if (mem_type < 0 or mem_type > 3) else mem_type
-    b_force_zero_latency = True if b_force_zero_latency == 'YES' else False
     if not os.path.exists(input_file_path):  # Input file (must exist)
         print("ERROR: input file doesn't exist.")
         exit()
@@ -254,7 +244,6 @@ if __name__ == "__main__":
         output_file_path,
         device_id,
         mem_type,
-        b_force_zero_latency,
         crop_rect,
         seek_frame,
         seek_mode,
