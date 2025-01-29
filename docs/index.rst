@@ -16,12 +16,15 @@ The rocPyDecode public repository is located at `https://github.com/ROCm/rocPyDe
 
   .. grid-item-card:: Install
 
-    * :doc:`Prerequisites <./install/rocPyDecode-prerequisites>`
-    * :doc:`Installation <./install/rocPyDecode-install>`
+    * :doc:`rocPyDecode prerequisites <./install/rocPyDecode-prerequisites>`
+    * :doc:`rocPyDecode installation <./install/rocPyDecode-install>`
+
+.. grid:: 2
+  :gutter: 3
 
   .. grid-item-card:: Conceptual
 
-    * :doc:`rocPyDecode surface data memory locations <conceptual/rocPyDecode-mem-types.rst>`
+    * :doc:`rocPyDecode surface data memory locations <./conceptual/rocPyDecode-mem-types>`
   
   .. grid-item-card:: How to
 
@@ -37,9 +40,9 @@ The rocPyDecode public repository is located at `https://github.com/ROCm/rocPyDe
     * :doc:`Supported codecs and hardware <reference/rocPyDecode-codecs-and-hardware>`
     * :doc:`API reference<reference/rocPyDecode>`
       
-      * :doc:`Structs <reference/structures>`
-      * :doc:`Decode Class <reference/decoderClass>`
-      * :doc:`Demuxer CLass <reference/demuxerClass>`
+      * :doc:`rocPyDecode structures <./reference/structures>`
+      * :doc:`rocPyDecode decoder class <./reference/decoderClass>`
+      * :doc:`rocPyDecode demuxer CLass <./reference/demuxerClass>`
 
 
 To contribute to the documentation, refer to
