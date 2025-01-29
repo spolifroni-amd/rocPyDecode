@@ -23,16 +23,21 @@ The code is open and hosted at `<https://github.com/ROCm/rocPyDecode>`_.
 
     * :doc:`rocPyDecode installation <./install/install>`
 
-
-The documentation is structured as follows:
-
 .. grid:: 2
   :gutter: 3
 
+  .. grid-item-card:: Conceptual
+
+    * :doc:`rocPyDecode surface data memory locations <conceptual/rocPyDecode-mem-types.rst>`
+  
   .. grid-item-card:: How to
 
-    * :doc:`Using rocPyDecode <how-to/using-rocPydecode>`
-    
+    * :doc:`Use rocPyDecode <how-to/using-rocPydecode>`
+
+  .. grid-item-card:: Tutorials
+
+    * `rocPyDecode samples <https://github.com/ROCm/rocPyDecode/tree/develop/samples>`_   
+  
   .. grid-item-card:: Reference
     
     * :doc:`rocPyDecode API <reference/rocPyDecode>`
@@ -40,10 +45,6 @@ The documentation is structured as follows:
       * :doc:`rocPyDecode Structs <reference/structures>`
       * :doc:`Decode Class <reference/decoderClass>`
       * :doc:`Demuxer CLass <reference/demuxerClass>`
-
-  .. grid-item-card:: Tutorials
-
-    * `GitHub samples <https://github.com/ROCm/rocPyDecode/tree/develop/samples>`_
 
 To contribute to the documentation, refer to
 `Contributing to ROCm <https://rocm.docs.amd.com/en/latest/contribute/contributing.html>`_.
