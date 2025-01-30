@@ -6,10 +6,13 @@
 rocPyDecode documentation
 ********************************************************************
 
-rocPyDecode is a Python binding for the `rocDecode <https://rocm.docs.amd.com/projects/rocDecode/en/latest/>`_ APIs. It connects Python and C/C++ libraries, enabling function calling and data passing between the two languages.  To learn more, see :doc:`what-is-rocPyDecode`
+rocPyDecode is a Python binding for the `rocDecode <https://rocm.docs.amd.com/projects/rocDecode/en/latest/>`_ APIs. It connects Python and C/C++ libraries, enabling function calling and data passing between the two languages.
+
+rocPyDecode decodes compressed video streams while keeping the resulting decoded frames in video memory, avoiding unnecessary data copies. rocPyDecode lets you use the FFMpeg demultiplexer (demuxer) to seek and demultiplex (demux) packetized media files, and integrates with machine learning frameworks such as PyTorch to facilitate machine learning on decoded surfaces.
+ 
+The rocPyDecode python library uses the rocDecode C++ SDK library to decode video streams based on the number of available media engines (VCNs) on the GPU. AMD GPUs contain one or more VCNs that can be used for accelerated, hardware-based video decoding. Hardware decoders offload decoding tasks from the CPU to the GPU, reducing power consumption and boosting decoding throughput.
 
 The rocPyDecode public repository is located at `https://github.com/ROCm/rocPyDecode <https://github.com/ROCm/rocPyDecode>`_.
-
 
 .. grid:: 2
   :gutter: 3
