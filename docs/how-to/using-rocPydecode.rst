@@ -146,7 +146,7 @@ From the ``videodecode.py`` example:
 
     n_frame_returned = viddec.DecodeFrame(packet)
 
-Frames can be further processed using the ``GetFrameRgb()`` and ``GetFrameYuv()`` functions. ``GetFrameRgb()`` and ``GetFrameYuv()`` return pointers to the frame packet in memory. The ``GetOutputSurfaceInfo()`` functions returns information about the decoded frames that needs to be passed to the processing functions. 
+Frames can be further processed using the ``GetFrameRgb()`` and ``GetFrameYuv()`` functions. ``GetFrameRgb()`` and ``GetFrameYuv()`` return pointers to the frame packet in memory. The ``GetOutputSurfaceInfo()`` function returns information about the decoded frames that need to be passed to the processing functions. 
 
 From the ``videodecode.py`` example:
 
