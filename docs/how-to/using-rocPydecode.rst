@@ -117,7 +117,7 @@ From the |videodecode|_ example:
         print("ERROR: Codec is not supported on this GPU " + cfg.device_name)
         exit()
 
-Before entering the decoder loop, set the flush mode with ``SetReconfigParams()``. Flushing is needed to finalize the decoding process when the video being decoded has frames with different resolutions.  The flush mode is based on whether or not decoded frames are written to file. 
+Before entering the decoder loop, set the flush mode with ``SetReconfigParams()``. Flushing is needed to finalize the decoding process when the video being decoded has frames with different resolutions.  The flush mode depends on whether decoded frames are written to file. 
 
 From the ``videodecode.py`` example:
 
