@@ -17,7 +17,8 @@ ROCm needs to be installed using the `AMDGPU installer <https://rocm.docs.amd.co
 rocPyDecode has the following prerequisites:
 
 * CMake 3.12 or later
-* Python3 and Python3 PIP
+* Python3 3.9 or later
+* Python3 pip
 * PyBind11
 * rocDecode
 * pkg-config
